@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Smart Service Desk{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="dashboard-header">
+        <h1>Welcome, {{ current_user.name }}!</h1>
+        <p>Track and manage your service requests from one place.</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                    <polyline points="14,2 14,8 20,8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
+                </svg>
+            </div>
+            <div class="stat-value">{{ stats.total }}</div>
+            <div class="stat-label">Total Requests</div>
+        </div>
+
+        <div class="stat-card submitted">
+            <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+            </div>
+            <div class="stat-value">{{ stats.submitted }}</div>
+            <div class="stat-label">Submitted</div>
+        </div>
+
+        <div class="stat-card in-progress">
+            <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4" />
+                </svg>
+            </div>
+            <div class="stat-value">{{ stats.in_progress }}</div>
+            <div class="stat-label">In Progress</div>
+        </div>
+
+        <div class="stat-card resolved">
+            <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                    <polyline points="22,4 12,14.01 9,11.01" />
+                </svg>
+            </div>
+            <div class="stat-value">{{ stats.resolved }}</div>
+            <div class="stat-label">Resolved</div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="section-header">
+        <h2>Quick Actions</h2>
+    </div>
+
+    <div class="d-flex gap-4 mb-8" style="flex-wrap: wrap;">
+        <a href="{{ url_for('user.new_request') }}" class="btn btn-primary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="16" />
+                <line x1="8" y1="12" x2="16" y2="12" />
+            </svg>
+            New Request
+        </a>
+        <a href="{{ url_for('user.my_requests') }}" class="btn btn-secondary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                <polyline points="14,2 14,8 20,8" />
+            </svg>
+            View All Requests
+        </a>
+    </div>
+
+    <!-- Recent Requests -->
+    <div class="section-header">
+        <h2>Recent Requests</h2>
+        {% if recent_requests %}
+        <a href="{{ url_for('user.my_requests') }}" class="btn btn-secondary btn-sm">View All</a>
+        {% endif %}
+    </div>
+
+    {% if recent_requests %}
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in recent_requests %}
+                <tr>
+                    <td><strong>#{{ req.request_id }}</strong></td>
+                    <td>{{ req.title }}</td>
+                    <td>{{ req.category }}</td>
+                    <td>
+                        {% if req.status == STATUS_SUBMITTED %}
+                        <span class="badge badge-submitted">Submitted</span>
+                        {% elif req.status == STATUS_IN_PROGRESS %}
+                        <span class="badge badge-in-progress">In Progress</span>
+                        {% else %}
+                        <span class="badge badge-resolved">Resolved</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ req.created_at }}</td>
+                    <td>
+                        <a href="{{ url_for('user.request_detail', request_id=req.request_id) }}"
+                            class="btn btn-secondary btn-sm">
+                            View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                    <polyline points="14,2 14,8 20,8" />
+                </svg>
+            </div>
+            <h3>No Requests Yet</h3>
+            <p>You haven't submitted any service requests yet.</p>
+            <a href="{{ url_for('user.new_request') }}" class="btn btn-primary">
+                Create Your First Request
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

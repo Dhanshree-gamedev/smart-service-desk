@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Smart Service Desk - Modern Service Request Management{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1>Smart Service Desk</h1>
+            <p>A modern, production-ready platform for managing service requests with complete transparency and accountability.</p>
+            <div class="hero-buttons">
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                        <circle cx="8.5" cy="7" r="4"/>
+                        <path d="M20 8v6M23 11h-6"/>
+                    </svg>
+                    Get Started
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-lg">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/>
+                    </svg>
+                    Sign In
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+    <div class="container">
+        <h2>Why Choose Smart Service Desk?</h2>
+        
+        <div class="features-grid">
+            <!-- Feature 1 -->
+            <div class="card feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        <path d="M12 11v6M9 14h6"/>
+                    </svg>
+                </div>
+                <h3>Easy Request Submission</h3>
+                <p>Submit service requests in seconds with our intuitive form. Track everything from creation to resolution.</p>
+            </div>
+            
+            <!-- Feature 2 -->
+            <div class="card feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12,6 12,12 16,14"/>
+                    </svg>
+                </div>
+                <h3>Real-Time Tracking</h3>
+                <p>Monitor your request status in real-time. Know exactly where your request stands at every moment.</p>
+            </div>
+            
+            <!-- Feature 3 -->
+            <div class="card feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <path d="M9 12l2 2 4-4"/>
+                    </svg>
+                </div>
+                <h3>Complete Accountability</h3>
+                <p>Every action is logged with timestamps and admin remarks. Full transparency guaranteed.</p>
+            </div>
+            
+            <!-- Feature 4 -->
+            <div class="card feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+                    </svg>
+                </div>
+                <h3>Role-Based Access</h3>
+                <p>Secure separation between users and administrators. Right access to the right people.</p>
+            </div>
+            
+            <!-- Feature 5 -->
+            <div class="card feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10,9 9,9 8,9"/>
+                    </svg>
+                </div>
+                <h3>Audit Trail</h3>
+                <p>Complete history of all status changes. Never lose track of what happened and when.</p>
+            </div>
+            
+            <!-- Feature 6 -->
+            <div class="card feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="3" y1="9" x2="21" y2="9"/>
+                        <line x1="9" y1="21" x2="9" y2="9"/>
+                    </svg>
+                </div>
+                <h3>Admin Dashboard</h3>
+                <p>Powerful dashboard with statistics, filters, and quick actions for efficient management.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Status Flow Section -->
+<section style="padding: 4rem 0; background: var(--gray-50);">
+    <div class="container">
+        <h2 class="text-center mb-8">Simple Request Lifecycle</h2>
+        
+        <div class="status-progress" style="max-width: 600px; margin: 0 auto;">
+            <div class="status-step completed">
+                <div class="status-step-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 6L9 17l-5-5"/>
+                    </svg>
+                </div>
+                <span class="status-step-label">Submitted</span>
+            </div>
+            
+            <div class="status-step active">
+                <div class="status-step-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                    </svg>
+                </div>
+                <span class="status-step-label">In Progress</span>
+            </div>
+            
+            <div class="status-step">
+                <div class="status-step-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9 12l2 2 4-4"/>
+                    </svg>
+                </div>
+                <span class="status-step-label">Resolved</span>
+            </div>
+        </div>
+        
+        <p class="text-center mt-6" style="max-width: 500px; margin-left: auto; margin-right: auto;">
+            Every request follows a strict lifecycle ensuring nothing gets lost. Forward-only transitions maintain accountability.
+        </p>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section style="padding: 4rem 0; text-align: center;">
+    <div class="container">
+        <h2>Ready to Get Started?</h2>
+        <p style="max-width: 500px; margin: 0 auto 2rem;">
+            Join institutions, campuses, and organizations already using Smart Service Desk.
+        </p>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+            Create Your Account
+        </a>
+    </div>
+</section>
+{% endblock %}

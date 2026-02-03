@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}My Requests - Smart Service Desk{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="dashboard-header">
+        <h1>My Requests</h1>
+        <p>View and track all your service requests.</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+        <div class="filter-group">
+            <label for="status-filter">Status:</label>
+            <select id="status-filter" name="status">
+                <option value="">All Statuses</option>
+                {% for status in statuses %}
+                <option value="{{ status }}" {% if status_filter==status %}selected{% endif %}>{{ status }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <a href="{{ url_for('user.new_request') }}" class="btn btn-primary" style="margin-left: auto;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="16" />
+                <line x1="8" y1="12" x2="16" y2="12" />
+            </svg>
+            New Request
+        </a>
+    </div>
+
+    <!-- Requests Table -->
+    {% if requests %}
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Request ID</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Last Updated</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in requests %}
+                <tr>
+                    <td><strong>#{{ req.request_id }}</strong></td>
+                    <td>{{ req.title }}</td>
+                    <td>{{ req.category }}</td>
+                    <td>
+                        {% if req.status == STATUS_SUBMITTED %}
+                        <span class="badge badge-submitted">Submitted</span>
+                        {% elif req.status == STATUS_IN_PROGRESS %}
+                        <span class="badge badge-in-progress">In Progress</span>
+                        {% else %}
+                        <span class="badge badge-resolved">Resolved</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ req.created_at }}</td>
+                    <td>{{ req.updated_at or req.created_at }}</td>
+                    <td>
+                        <a href="{{ url_for('user.request_detail', request_id=req.request_id) }}"
+                            class="btn btn-secondary btn-sm">
+                            View Details
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+            </div>
+            <h3>No Requests Found</h3>
+            {% if status_filter %}
+            <p>No requests with status "{{ status_filter }}" found.</p>
+            <a href="{{ url_for('user.my_requests') }}" class="btn btn-secondary">
+                Clear Filter
+            </a>
+            {% else %}
+            <p>You haven't submitted any service requests yet.</p>
+            <a href="{{ url_for('user.new_request') }}" class="btn btn-primary">
+                Create Your First Request
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

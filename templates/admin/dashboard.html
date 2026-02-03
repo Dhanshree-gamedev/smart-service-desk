@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Smart Service Desk{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="dashboard-header">
+        <h1>Admin Dashboard</h1>
+        <p>Monitor and manage all service requests across the system.</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                    <polyline points="14,2 14,8 20,8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
+                </svg>
+            </div>
+            <div class="stat-value">{{ stats.total }}</div>
+            <div class="stat-label">Total Requests</div>
+        </div>
+
+        <div class="stat-card submitted">
+            <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+            </div>
+            <div class="stat-value">{{ stats.submitted }}</div>
+            <div class="stat-label">Pending Review</div>
+        </div>
+
+        <div class="stat-card in-progress">
+            <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4" />
+                </svg>
+            </div>
+            <div class="stat-value">{{ stats.in_progress }}</div>
+            <div class="stat-label">In Progress</div>
+        </div>
+
+        <div class="stat-card resolved">
+            <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                    <polyline points="22,4 12,14.01 9,11.01" />
+                </svg>
+            </div>
+            <div class="stat-value">{{ stats.resolved }}</div>
+            <div class="stat-label">Resolved</div>
+        </div>
+    </div>
+
+    <!-- Feedback Stats -->
+    {% if feedback_stats and feedback_stats.total > 0 %}
+    <div class="card mb-8"
+        style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-color: rgba(245, 158, 11, 0.3);">
+        <div class="card-body">
+            <div class="d-flex gap-6" style="align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                <div>
+                    <h3 style="color: #92400e; margin-bottom: 0.25rem;">User Satisfaction</h3>
+                    <p style="color: #b45309; margin: 0;">Based on {{ feedback_stats.total }} feedback{% if
+                        feedback_stats.total != 1 %}s{% endif %}</p>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: #92400e;">{{ feedback_stats.average_rating
+                        }}</div>
+                    <div style="color: #f59e0b; font-size: 1.5rem;">{{ '★' * (feedback_stats.average_rating | int) }}{{
+                        '☆' * (5 - (feedback_stats.average_rating | int)) }}</div>
+                </div>
+                <a href="{{ url_for('admin.feedback') }}" class="btn btn-secondary">View All Feedback</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Category & Priority Breakdown -->
+    <div class="d-flex gap-6 mb-8" style="flex-wrap: wrap;">
+        <!-- Category Breakdown -->
+        {% if stats.by_category %}
+        <div class="card" style="flex: 1; min-width: 300px;">
+            <div class="card-header d-flex" style="justify-content: space-between; align-items: center;">
+                <h3>By Category</h3>
+                <a href="{{ url_for('admin.categories') }}" class="btn btn-secondary btn-sm">Manage</a>
+            </div>
+            <div class="card-body">
+                {% for category, count in stats.by_category.items() %}
+                <div class="d-flex"
+                    style="justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--gray-100);">
+                    <span>{{ category }}</span>
+                    <strong>{{ count }}</strong>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Priority Breakdown -->
+        {% if stats.by_priority %}
+        <div class="card" style="flex: 1; min-width: 300px;">
+            <div class="card-header">
+                <h3>By Priority</h3>
+            </div>
+            <div class="card-body">
+                {% for priority in ['Critical', 'High', 'Medium', 'Low'] %}
+                {% set count = stats.by_priority.get(priority, 0) %}
+                <div class="d-flex"
+                    style="justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--gray-100);">
+                    <span>
+                        {% if priority == 'Critical' %}
+                        <span class="badge badge-priority-critical">{{ priority }}</span>
+                        {% elif priority == 'High' %}
+                        <span class="badge badge-priority-high">{{ priority }}</span>
+                        {% elif priority == 'Medium' %}
+                        <span class="badge badge-priority-medium">{{ priority }}</span>
+                        {% else %}
+                        <span class="badge badge-priority-low">{{ priority }}</span>
+                        {% endif %}
+                    </span>
+                    <strong>{{ count }}</strong>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="section-header">
+        <h2>Quick Actions</h2>
+    </div>
+
+    <div class="d-flex gap-4 mb-8" style="flex-wrap: wrap;">
+        <a href="{{ url_for('admin.all_requests') }}?status=Submitted" class="btn btn-primary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            Review Pending ({{ stats.submitted }})
+        </a>
+        <a href="{{ url_for('admin.all_requests') }}?priority=Critical" class="btn btn-danger">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="7.86,2 16.14,2 22,7.86 22,16.14 16.14,22 7.86,22 2,16.14 2,7.86" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            Critical Priority
+        </a>
+        <a href="{{ url_for('admin.categories') }}" class="btn btn-secondary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+            </svg>
+            Manage Categories
+        </a>
+        <a href="{{ url_for('admin.feedback') }}" class="btn btn-secondary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon
+                    points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+            </svg>
+            View Feedback
+        </a>
+        <a href="{{ url_for('admin.all_requests') }}" class="btn btn-secondary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                <polyline points="14,2 14,8 20,8" />
+            </svg>
+            View All Requests
+        </a>
+    </div>
+
+    <!-- Recent Requests -->
+    <div class="section-header">
+        <h2>Recent Requests</h2>
+        <a href="{{ url_for('admin.all_requests') }}" class="btn btn-secondary btn-sm">View All</a>
+    </div>
+
+    {% if recent_requests %}
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Requester</th>
+                    <th>Category</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in recent_requests %}
+                <tr>
+                    <td><strong>#{{ req.request_id }}</strong></td>
+                    <td>{{ req.title[:40] }}{% if req.title|length > 40 %}...{% endif %}</td>
+                    <td>{{ req.user_name }}</td>
+                    <td>{{ req.category_name }}</td>
+                    <td>
+                        {% if req.priority == 'Critical' %}
+                        <span class="badge badge-priority-critical">{{ req.priority }}</span>
+                        {% elif req.priority == 'High' %}
+                        <span class="badge badge-priority-high">{{ req.priority }}</span>
+                        {% elif req.priority == 'Medium' %}
+                        <span class="badge badge-priority-medium">{{ req.priority }}</span>
+                        {% else %}
+                        <span class="badge badge-priority-low">{{ req.priority }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if req.status == 'Submitted' %}
+                        <span class="badge badge-submitted">Submitted</span>
+                        {% elif req.status == 'In Progress' %}
+                        <span class="badge badge-in-progress">In Progress</span>
+                        {% else %}
+                        <span class="badge badge-resolved">Resolved</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ req.created_at[:10] }}</td>
+                    <td>
+                        <a href="{{ url_for('admin.request_detail', request_id=req.request_id) }}"
+                            class="btn btn-secondary btn-sm">
+                            Manage
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                    <polyline points="22,4 12,14.01 9,11.01" />
+                </svg>
+            </div>
+            <h3>No Requests Yet</h3>
+            <p>No service requests have been submitted yet.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

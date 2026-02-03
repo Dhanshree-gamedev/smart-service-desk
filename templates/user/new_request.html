@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}New Request - Smart Service Desk{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 700px;">
+    <div class="dashboard-header">
+        <h1>Submit New Request</h1>
+        <p>Fill out the form below to submit a service request.</p>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('user.new_request') }}" data-validate>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <!-- Category Selection -->
+                <div class="form-group">
+                    <label for="category_id" class="form-label">Category *</label>
+                    <select id="category_id" name="category_id" class="form-control form-select" required>
+                        <option value="">Select a category</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.category_id }}" {% if category_id==cat.category_id %}selected{% endif %}>
+                            {{ cat.name }}
+                            {% if cat.description %} - {{ cat.description[:50] }}{% if cat.description|length > 50
+                            %}...{% endif %}{% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text">Choose the category that best describes your issue.</div>
+                </div>
+
+                <!-- Priority Selection -->
+                <div class="form-group">
+                    <label for="priority" class="form-label">Priority Level</label>
+                    <select id="priority" name="priority" class="form-control form-select">
+                        {% for level in priority_levels %}
+                        <option value="{{ level }}" {% if priority==level or (not priority and level=='Medium' )
+                            %}selected{% endif %}>
+                            {{ level }}
+                            {% if level == 'Low' %} - Minor inconvenience{% endif %}
+                            {% if level == 'Medium' %} - Normal request (default){% endif %}
+                            {% if level == 'High' %} - Affects multiple users{% endif %}
+                            {% if level == 'Critical' %} - Safety or system down{% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text">Suggest a priority level. Admins may adjust this based on assessment.</div>
+                </div>
+
+                <!-- Title -->
+                <div class="form-group">
+                    <label for="title" class="form-label">Title *</label>
+                    <input type="text" id="title" name="title" class="form-control"
+                        placeholder="Brief summary of your issue" value="{{ title or '' }}" required minlength="5"
+                        maxlength="200">
+                    <div class="form-text">Provide a clear, concise title (5-200 characters).</div>
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label for="description" class="form-label">Description *</label>
+                    <textarea id="description" name="description" class="form-control" rows="5"
+                        placeholder="Describe your issue in detail. Include any relevant information..." required
+                        minlength="10">{{ description or '' }}</textarea>
+                    <div class="form-text">Provide details to help us understand and resolve your issue (minimum 10
+                        characters).</div>
+                </div>
+
+                <!-- Submit -->
+                <div class="d-flex gap-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                        </svg>
+                        Submit Request
+                    </button>
+                    <a href="{{ url_for('user.dashboard') }}" class="btn btn-secondary btn-lg">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Info Box -->
+    <div class="card mt-6" style="background: var(--primary-50); border-color: rgba(99, 102, 241, 0.2);">
+        <div class="card-body">
+            <h4 style="color: var(--primary-600); margin-bottom: 0.5rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="display: inline; vertical-align: middle; margin-right: 0.5rem;">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 16v-4M12 8h.01" />
+                </svg>
+                What happens next?
+            </h4>
+            <ol style="margin: 0.5rem 0 0 1rem; color: var(--primary-700); font-size: 0.9375rem;">
+                <li>Your request will be submitted with status <strong>Submitted</strong></li>
+                <li>An admin will review and start working on it (<strong>In Progress</strong>)</li>
+                <li>Once complete, the request will be marked as <strong>Resolved</strong></li>
+                <li>You can then provide feedback on the service</li>
+            </ol>
+        </div>
+    </div>
+</div>
+{% endblock %}

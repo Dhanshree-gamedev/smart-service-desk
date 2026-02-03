@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}User Feedback - Admin - Smart Service Desk{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="dashboard-header">
+        <h1>User Feedback</h1>
+        <p>View all satisfaction ratings and comments from users.</p>
+    </div>
+
+    <!-- Feedback Stats -->
+    <div class="stats-grid mb-6">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                    <polyline points="14,2 14,8 20,8" />
+                </svg>
+            </div>
+            <div class="stat-value">{{ stats.total }}</div>
+            <div class="stat-label">Total Feedback</div>
+        </div>
+
+        <div class="stat-card" style="background: linear-gradient(135deg, #fef3c7, #fde68a);">
+            <div class="stat-icon" style="background: #f59e0b; color: white;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon
+                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                </svg>
+            </div>
+            <div class="stat-value">{{ stats.average_rating }}</div>
+            <div class="stat-label">Average Rating</div>
+        </div>
+
+        {% for rating in [5, 4, 3, 2, 1] %}
+        {% set count = stats.by_rating.get(rating, 0) %}
+        <div class="stat-card" style="min-width: 100px;">
+            <div class="stat-value" style="font-size: 1.25rem;">
+                {{ '★' * rating }}{{ '☆' * (5 - rating) }}
+            </div>
+            <div class="stat-label">{{ count }} review{% if count != 1 %}s{% endif %}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Feedback List -->
+    {% if feedbacks %}
+    <div class="card">
+        <div class="card-body" style="padding: 0;">
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Request</th>
+                            <th>User</th>
+                            <th>Rating</th>
+                            <th>Comment</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fb in feedbacks %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('admin.request_detail', request_id=fb.request_id) }}">
+                                    <strong>#{{ fb.request_id }}</strong> - {{ fb.request_title }}
+                                </a>
+                            </td>
+                            <td>
+                                {{ fb.user_name }}<br>
+                                <small class="text-muted">{{ fb.user_email }}</small>
+                            </td>
+                            <td>
+                                <span class="star-rating" style="color: #f59e0b;">
+                                    {{ '★' * fb.rating }}{{ '☆' * (5 - fb.rating) }}
+                                </span>
+                            </td>
+                            <td style="max-width: 300px;">
+                                {% if fb.comment %}
+                                {{ fb.comment }}
+                                {% else %}
+                                <span class="text-muted">No comment</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ fb.submitted_at }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon
+                        points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                </svg>
+            </div>
+            <h3>No Feedback Yet</h3>
+            <p>Users can submit feedback after their requests are resolved.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

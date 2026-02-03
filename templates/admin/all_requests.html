@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}All Requests - Admin - Smart Service Desk{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="dashboard-header">
+        <h1>All Service Requests</h1>
+        <p>View and manage all submitted service requests.</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-6">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('admin.all_requests') }}" class="d-flex gap-4"
+                style="flex-wrap: wrap; align-items: flex-end;">
+                <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+                    <label for="status" class="form-label">Status</label>
+                    <select id="status" name="status" class="form-control form-select">
+                        <option value="">All Statuses</option>
+                        {% for s in statuses %}
+                        <option value="{{ s }}" {% if status_filter==s %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+                    <label for="category" class="form-label">Category</label>
+                    <select id="category" name="category" class="form-control form-select">
+                        <option value="">All Categories</option>
+                        {% for c in categories %}
+                        <option value="{{ c }}" {% if category_filter==c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+                    <label for="priority" class="form-label">Priority</label>
+                    <select id="priority" name="priority" class="form-control form-select">
+                        <option value="">All Priorities</option>
+                        {% for p in priority_levels %}
+                        <option value="{{ p }}" {% if priority_filter==p %}selected{% endif %}>{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-secondary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46" />
+                    </svg>
+                    Apply Filters
+                </button>
+
+                {% if status_filter or category_filter or priority_filter %}
+                <a href="{{ url_for('admin.all_requests') }}" class="btn btn-secondary">Clear Filters</a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <!-- Requests Table -->
+    <div class="card">
+        <div class="card-body" style="padding: 0;">
+            {% if requests %}
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Requester</th>
+                            <th>Category</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in requests %}
+                        <tr>
+                            <td><strong>#{{ req.request_id }}</strong></td>
+                            <td style="max-width: 200px;">{{ req.title[:50] }}{% if req.title|length > 50 %}...{% endif
+                                %}</td>
+                            <td>
+                                {{ req.user_name }}<br>
+                                <small class="text-muted">{{ req.user_email }}</small>
+                            </td>
+                            <td>{{ req.category_name }}</td>
+                            <td>
+                                {% if req.priority == 'Critical' %}
+                                <span class="badge badge-priority-critical">{{ req.priority }}</span>
+                                {% elif req.priority == 'High' %}
+                                <span class="badge badge-priority-high">{{ req.priority }}</span>
+                                {% elif req.priority == 'Medium' %}
+                                <span class="badge badge-priority-medium">{{ req.priority }}</span>
+                                {% else %}
+                                <span class="badge badge-priority-low">{{ req.priority }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if req.status == statuses[0] %}
+                                <span class="badge badge-submitted">{{ req.status }}</span>
+                                {% elif req.status == statuses[1] %}
+                                <span class="badge badge-in-progress">{{ req.status }}</span>
+                                {% else %}
+                                <span class="badge badge-resolved">{{ req.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ req.created_at[:10] }}</td>
+                            <td>
+                                <a href="{{ url_for('admin.request_detail', request_id=req.request_id) }}"
+                                    class="btn btn-primary btn-sm">
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                        <polyline points="14,2 14,8 20,8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10,9 9,9 8,9" />
+                    </svg>
+                </div>
+                <h3>No Requests Found</h3>
+                <p>
+                    {% if status_filter or category_filter or priority_filter %}
+                    No requests match the selected filters. Try adjusting your filters.
+                    {% else %}
+                    There are no service requests in the system yet.
+                    {% endif %}
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Request Count -->
+    {% if requests %}
+    <p class="text-muted text-center mt-4">
+        Showing {{ requests|length }} request{% if requests|length != 1 %}s{% endif %}
+        {% if status_filter or category_filter or priority_filter %}
+        (filtered)
+        {% endif %}
+    </p>
+    {% endif %}
+</div>
+{% endblock %}

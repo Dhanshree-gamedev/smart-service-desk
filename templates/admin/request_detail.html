@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Request #{{ request.request_id }} - Admin - Smart Service Desk{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px;">
+    <!-- Back Button -->
+    <div class="mb-6">
+        <a href="{{ url_for('admin.all_requests') }}" class="btn btn-secondary btn-sm">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Back to All Requests
+        </a>
+    </div>
+
+    <!-- Request Header -->
+    <div class="card mb-6">
+        <div class="card-body">
+            <div class="request-header">
+                <div>
+                    <div class="request-id">Request #{{ request.request_id }}</div>
+                    <h1 style="font-size: 1.5rem; margin-bottom: 0;">{{ request.title }}</h1>
+                </div>
+                <div class="d-flex gap-2" style="flex-wrap: wrap;">
+                    <!-- Priority Badge -->
+                    {% if request.priority == 'Critical' %}
+                    <span class="badge badge-priority-critical">{{ request.priority }}</span>
+                    {% elif request.priority == 'High' %}
+                    <span class="badge badge-priority-high">{{ request.priority }}</span>
+                    {% elif request.priority == 'Medium' %}
+                    <span class="badge badge-priority-medium">{{ request.priority }}</span>
+                    {% else %}
+                    <span class="badge badge-priority-low">{{ request.priority }}</span>
+                    {% endif %}
+
+                    <!-- Status Badge -->
+                    {% if request.status == statuses[0] %}
+                    <span class="badge badge-submitted" style="font-size: 0.875rem; padding: 0.5rem 1rem;">{{
+                        request.status }}</span>
+                    {% elif request.status == statuses[1] %}
+                    <span class="badge badge-in-progress" style="font-size: 0.875rem; padding: 0.5rem 1rem;">{{
+                        request.status }}</span>
+                    {% else %}
+                    <span class="badge badge-resolved" style="font-size: 0.875rem; padding: 0.5rem 1rem;">{{
+                        request.status }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="request-meta">
+                <div class="request-meta-item">
+                    <strong>Requester:</strong> {{ request.user_name }} ({{ request.user_email }})
+                </div>
+                <div class="request-meta-item">
+                    <strong>Category:</strong> {{ request.category_name }}
+                </div>
+                <div class="request-meta-item">
+                    <strong>Created:</strong> {{ request.created_at }}
+                </div>
+                <div class="request-meta-item">
+                    <strong>Last Updated:</strong> {{ request.updated_at or request.created_at }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Description -->
+    <div class="card mb-6">
+        <div class="card-header">
+            <h3>Description</h3>
+        </div>
+        <div class="card-body">
+            <p style="white-space: pre-wrap; margin: 0;">{{ request.description }}</p>
+        </div>
+    </div>
+
+    <!-- Priority Update (if not resolved) -->
+    {% if not request.is_resolved %}
+    <div class="card mb-6">
+        <div class="card-header">
+            <h3>Update Priority</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('admin.update_priority', request_id=request.request_id) }}"
+                class="d-flex gap-4" style="align-items: flex-end;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label for="priority" class="form-label">Priority Level</label>
+                    <select id="priority" name="priority" class="form-control form-select">
+                        {% for level in priority_levels %}
+                        <option value="{{ level }}" {% if request.priority==level %}selected{% endif %}>
+                            {{ level }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-secondary">
+                    Update Priority
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Update Status Form -->
+    {% if valid_transitions %}
+    <div class="card mb-6">
+        <div class="card-header">
+            <h3>Update Status</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('admin.update_request', request_id=request.request_id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="form-group">
+                    <label for="status" class="form-label">New Status *</label>
+                    <select id="status" name="status" class="form-control form-select" required>
+                        <option value="">Select new status</option>
+                        {% for status in valid_transitions %}
+                        <option value="{{ status }}">{{ status }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text">
+                        Current: <strong>{{ request.status }}</strong>
+                        → Valid transitions: {{ valid_transitions|join(', ') or 'None (final state)' }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="remark" class="form-label">Remark / Comments *</label>
+                    <textarea id="remark" name="remark" class="form-control" rows="3"
+                        placeholder="Explain the status change..." required></textarea>
+                    <div class="form-text">This will be logged and visible to the user.</div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+                        <polyline points="17,21 17,13 7,13 7,21" />
+                        <polyline points="7,3 7,8 15,8" />
+                    </svg>
+                    Update Request
+                </button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <div class="card mb-6" style="background: var(--success-50); border-color: rgba(16, 185, 129, 0.2);">
+        <div class="card-body">
+            <h4 style="color: var(--success-600); margin-bottom: 0.5rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="display: inline; vertical-align: middle; margin-right: 0.5rem;">
+                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                    <polyline points="22,4 12,14.01 9,11.01" />
+                </svg>
+                Request Resolved
+            </h4>
+            <p style="color: var(--success-600); margin: 0; font-size: 0.9375rem;">
+                This request has been resolved and is now in its final state. No further status changes are allowed.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- User Feedback (if exists) -->
+    {% if feedback %}
+    <div class="card mb-6" style="background: #fffbeb; border-color: rgba(245, 158, 11, 0.3);">
+        <div class="card-header" style="border-color: rgba(245, 158, 11, 0.2);">
+            <h3 style="color: #b45309;">User Feedback</h3>
+        </div>
+        <div class="card-body" style="text-align: center;">
+            <div class="star-rating" style="font-size: 2rem; color: #f59e0b; margin-bottom: 0.5rem;">
+                {{ '★' * feedback.rating }}{{ '☆' * (5 - feedback.rating) }}
+            </div>
+            {% if feedback.comment %}
+            <p style="font-style: italic; color: #92400e; max-width: 500px; margin: 0.5rem auto;">
+                "{{ feedback.comment }}"
+            </p>
+            {% endif %}
+            <p class="text-muted mt-2" style="font-size: 0.875rem;">
+                Submitted on {{ feedback.submitted_at }}
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Activity Timeline -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Activity Timeline (Audit Log)</h3>
+        </div>
+        <div class="card-body">
+            <div class="timeline">
+                {% for log in status_logs %}
+                <div class="timeline-item {% if loop.last %}active{% else %}completed{% endif %}">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-time">{{ log.updated_at }}</div>
+                        <div class="timeline-title">
+                            {% if log.old_status %}
+                            {% if 'Priority changed' in log.remark %}
+                            {{ log.remark }}
+                            {% else %}
+                            Status changed from <strong>{{ log.old_status }}</strong> to <strong>{{ log.new_status
+                                }}</strong>
+                            {% endif %}
+                            {% else %}
+                            Request created with status <strong>{{ log.new_status }}</strong>
+                            {% endif %}
+                        </div>
+                        {% if log.remark and 'Priority changed' not in log.remark %}
+                        <p class="timeline-text">{{ log.remark }}</p>
+                        {% endif %}
+                        <div class="timeline-text text-muted">by {{ log.admin_name }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

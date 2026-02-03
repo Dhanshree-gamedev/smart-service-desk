@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Smart Service Desk - A production-ready service request management system">
+    <title>{% block title %}Smart Service Desk{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="container">
+                <a href="{{ url_for('landing') }}" class="navbar-brand">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                    </svg>
+                    Smart Service Desk
+                </a>
+                
+                <ul class="navbar-nav">
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.is_admin %}
+                            <li><a href="{{ url_for('admin.dashboard') }}" class="nav-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">Dashboard</a></li>
+                            <li><a href="{{ url_for('admin.all_requests') }}" class="nav-link {% if request.endpoint == 'admin.all_requests' %}active{% endif %}">All Requests</a></li>
+                        {% else %}
+                            <li><a href="{{ url_for('user.dashboard') }}" class="nav-link {% if request.endpoint == 'user.dashboard' %}active{% endif %}">Dashboard</a></li>
+                            <li><a href="{{ url_for('user.new_request') }}" class="nav-link {% if request.endpoint == 'user.new_request' %}active{% endif %}">New Request</a></li>
+                            <li><a href="{{ url_for('user.my_requests') }}" class="nav-link {% if request.endpoint == 'user.my_requests' %}active{% endif %}">My Requests</a></li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+                
+                <div class="nav-user">
+                    {% if current_user.is_authenticated %}
+                        <div class="nav-user-info">
+                            <div class="nav-user-name">{{ current_user.name }}</div>
+                            <div class="nav-user-role">{{ current_user.role }}</div>
+                        </div>
+                        <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary btn-sm">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-secondary btn-sm">Login</a>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Register</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="container" style="margin-top: 1rem;">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <span>{{ message }}</span>
+                            <button type="button" class="alert-close" aria-label="Close">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <p>&copy; 2024 Smart Service Desk. Production-ready service management.</p>
+                    <nav>
+                        <a href="#">Documentation</a> &bull;
+                        <a href="#">Support</a> &bull;
+                        <a href="#">Privacy Policy</a>
+                    </nav>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
