@@ -1,168 +1,262 @@
-# Smart Service Desk
+<div align="center">
 
-A production-ready web-based service request management system built with Flask and SQLite.
+# 🎫 Smart Service Desk
 
-![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
-![Flask](https://img.shields.io/badge/Flask-3.0-green.svg)
-![SQLite](https://img.shields.io/badge/SQLite-3-lightgrey.svg)
+### A Modern, Production-Ready Service Request Management System
 
-## Features
+[![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Flask](https://img.shields.io/badge/Flask-3.0-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-- **Role-Based Access Control**: Separate interfaces for Users and Administrators
-- **Request Lifecycle Management**: Strict forward-only status transitions (Submitted → In Progress → Resolved)
-- **Complete Audit Trail**: Every status change is logged with timestamps and remarks
-- **Modern UI**: Glassmorphism design with smooth animations
-- **CSRF Protection**: All forms protected against cross-site request forgery
-- **Production-Ready**: Indexed database, secure password hashing, session management
+[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [API](#-api-routes) • [Contributing](#-contributing)
 
-## Quick Start
+---
 
-### 1. Install Dependencies
+</div>
+
+## 📋 Overview
+
+**Smart Service Desk** is a full-featured service request management system built with Flask. It provides a streamlined workflow for submitting, tracking, and resolving service requests with role-based access control, real-time status tracking, and a modern glassmorphism UI design.
+
+Perfect for organizations that need:
+- 📝 Internal ticketing systems
+- 🏢 Facilities management
+- 💻 IT helpdesk solutions
+- 🎓 Academic support portals
+
+---
+
+## ✨ Features
+
+<table>
+<tr>
+<td width="50%">
+
+### 👤 User Features
+- ✅ Submit service requests with priority levels
+- ✅ Track request status in real-time
+- ✅ View complete activity timeline
+- ✅ Submit satisfaction ratings for resolved requests
+- ✅ Secure authentication with password hashing
+
+</td>
+<td width="50%">
+
+### 🔧 Admin Features
+- ✅ Manage all service requests
+- ✅ Update request status with audit logging
+- ✅ Dynamic category management (CRUD)
+- ✅ Priority level management
+- ✅ View user feedback & satisfaction metrics
+- ✅ Filter requests by status/category/priority
+
+</td>
+</tr>
+</table>
+
+### 🎨 Design Highlights
+
+| Feature | Description |
+|---------|-------------|
+| 🌈 **Modern UI** | Glassmorphism design with smooth animations |
+| 📱 **Responsive** | Mobile-first design, works on all devices |
+| 🎯 **Priority Badges** | Color-coded (Low/Medium/High/Critical) |
+| ⭐ **Star Rating** | Interactive 5-star feedback system |
+| 📊 **Dashboard** | Real-time statistics and quick actions |
+
+---
+
+## 🚀 Installation
+
+### Prerequisites
+
+- Python 3.9 or higher
+- pip (Python package manager)
+
+### Quick Start
 
 ```bash
+# Clone the repository
+git clone https://github.com/Dhanshree-gamedev/smart-service-desk.git
+cd smart-service-desk
+
+# Create virtual environment (recommended)
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
+
+# Install dependencies
 pip install -r requirements.txt
-```
 
-### 2. Run the Application
-
-```bash
+# Run the application
 python app.py
 ```
 
-The server will start at `http://127.0.0.1:5000`
+The application will be available at **http://127.0.0.1:5000**
 
-### 3. Default Credentials
+### Default Credentials
 
-**Admin Account:**
-- Email: `admin@servicedesk.com`
-- Password: `admin123`
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@servicedesk.com` | `admin123` |
 
-## Project Structure
+> ⚠️ **Important**: Change default credentials before deploying to production!
+
+---
+
+## 💻 Usage
+
+### Request Lifecycle
 
 ```
-auth/
-├── app.py                    # Main Flask application
-├── config.py                 # Configuration settings
-├── database.py               # Database initialization
-├── requirements.txt          # Python dependencies
-├── models/
-│   ├── user.py               # User model with Flask-Login
-│   └── request.py            # Service request & audit log
-├── routes/
-│   ├── __init__.py           # Role decorators
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│  📝 SUBMITTED │ ──► │  🔄 IN PROGRESS │ ──► │  ✅ RESOLVED  │
+└──────────────┘     └──────────────┘     └──────────────┘
+     User                Admin                 Admin
+   submits             picks up              resolves
+   request              request               request
+```
+
+### Priority Levels
+
+| Priority | Badge | Use Case |
+|----------|-------|----------|
+| 🟢 **Low** | Gray | Non-urgent requests |
+| 🔵 **Medium** | Blue | Standard requests (default) |
+| 🟠 **High** | Orange | Urgent issues |
+| 🔴 **Critical** | Red (pulsing) | Emergency situations |
+
+---
+
+## 📁 Project Structure
+
+```
+smart-service-desk/
+├── 📄 app.py                 # Application entry point
+├── 📄 config.py              # Configuration settings
+├── 📄 database.py            # Database initialization & migrations
+├── 📄 requirements.txt       # Python dependencies
+│
+├── 📁 models/                # Data models
+│   ├── user.py               # User model with authentication
+│   ├── request.py            # Service request model
+│   ├── category.py           # Dynamic category model
+│   └── feedback.py           # User feedback model
+│
+├── 📁 routes/                # Route handlers
 │   ├── auth.py               # Login/Register/Logout
 │   ├── user.py               # User dashboard & requests
 │   └── admin.py              # Admin management
-├── static/
-│   ├── css/style.css         # Modern CSS design system
-│   └── js/main.js            # Client-side interactions
-├── templates/
-│   ├── base.html             # Base template
-│   ├── landing.html          # Public landing page
-│   ├── auth/                 # Login & Register
-│   ├── user/                 # User dashboard & views
-│   ├── admin/                # Admin dashboard & views
-│   └── errors/               # Error pages
-└── instance/
-    └── service_desk.db       # SQLite database (auto-created)
+│
+├── 📁 templates/             # Jinja2 templates
+│   ├── base.html             # Base layout
+│   ├── 📁 auth/              # Authentication pages
+│   ├── 📁 user/              # User interface
+│   ├── 📁 admin/             # Admin interface
+│   └── 📁 errors/            # Error pages
+│
+└── 📁 static/                # Static assets
+    ├── 📁 css/               # Stylesheets
+    └── 📁 js/                # JavaScript
 ```
 
-## User Roles
+---
 
-### User (Student/Citizen)
-- Register and login
-- Submit new service requests
-- Track request status and history
-- View audit trail for their requests
+## 🛣️ API Routes
 
-### Admin (Service Authority)
-- View all system requests
-- Filter by status and category
-- Update request status with remarks
-- Monitor complete audit logs
+### Authentication
+| Method | Route | Description |
+|--------|-------|-------------|
+| GET/POST | `/auth/login` | User login |
+| GET/POST | `/auth/register` | User registration |
+| GET | `/auth/logout` | User logout |
 
-## Request Lifecycle
+### User Routes
+| Method | Route | Description |
+|--------|-------|-------------|
+| GET | `/user/dashboard` | User dashboard |
+| GET/POST | `/user/new-request` | Create new request |
+| GET | `/user/my-requests` | View all user requests |
+| GET | `/user/request/<id>` | Request details |
+| POST | `/user/request/<id>/feedback` | Submit feedback |
 
-```
-Submitted → In Progress → Resolved
-```
+### Admin Routes
+| Method | Route | Description |
+|--------|-------|-------------|
+| GET | `/admin/dashboard` | Admin dashboard |
+| GET | `/admin/requests` | All requests (with filters) |
+| GET | `/admin/request/<id>` | Request details |
+| POST | `/admin/request/<id>/update` | Update status |
+| POST | `/admin/request/<id>/priority` | Update priority |
+| GET/POST | `/admin/categories` | Manage categories |
+| GET | `/admin/feedback` | View all feedback |
 
-- **Submitted**: Initial state when user creates a request
-- **In Progress**: Admin has started working on the request
-- **Resolved**: Request has been completed (final state, locked)
+---
 
-> **Note**: Reverse transitions are blocked. Once resolved, requests cannot be modified.
+## 🔒 Security Features
 
-## Database Schema
+- ✅ Password hashing with Werkzeug
+- ✅ CSRF protection on all forms
+- ✅ Session management with secure cookies
+- ✅ Role-based access control (RBAC)
+- ✅ Input validation and sanitization
+- ✅ SQL injection prevention (parameterized queries)
 
-### Users Table
-- `user_id` - Primary key
-- `name` - User's full name
-- `email` - Unique email address
-- `password` - Hashed password (PBKDF2)
-- `role` - USER or ADMIN
-- `created_at` - Registration timestamp
+---
 
-### Service Requests Table
-- `request_id` - Primary key (auto-generated)
-- `user_id` - Foreign key to users
-- `title` - Request title
-- `description` - Detailed description
-- `category` - Service category
-- `status` - Current status
-- `created_at` / `updated_at` - Timestamps
+## 🛠️ Tech Stack
 
-### Request Status Log (Audit Trail)
-- `log_id` - Primary key
-- `request_id` - Foreign key to requests
-- `old_status` / `new_status` - Status transition
-- `remark` - Admin comment
-- `updated_by` - Admin who made the change
-- `updated_at` - Timestamp
+<div align="center">
 
-## Security Features
+| Category | Technology |
+|----------|------------|
+| **Backend** | Flask 3.0, Python 3.9+ |
+| **Database** | SQLite with migrations |
+| **Auth** | Flask-Login, Werkzeug |
+| **Security** | Flask-WTF (CSRF) |
+| **Frontend** | HTML5, CSS3, JavaScript |
+| **Design** | Custom CSS with Glassmorphism |
 
-- **Password Hashing**: PBKDF2 with SHA-256 via Werkzeug
-- **CSRF Protection**: Flask-WTF token validation
-- **Session Security**: Secure cookie settings
-- **Role Guards**: Decorator-based route protection
-- **SQL Injection Prevention**: Parameterized queries
+</div>
 
-## API Endpoints
+---
 
-| Route | Method | Description |
-|-------|--------|-------------|
-| `/` | GET | Landing page |
-| `/auth/login` | GET/POST | User login |
-| `/auth/register` | GET/POST | User registration |
-| `/auth/logout` | GET | Session logout |
-| `/user/dashboard` | GET | User dashboard |
-| `/user/new-request` | GET/POST | Create request |
-| `/user/my-requests` | GET | List user requests |
-| `/user/request/<id>` | GET | Request detail |
-| `/admin/dashboard` | GET | Admin dashboard |
-| `/admin/requests` | GET | All requests |
-| `/admin/request/<id>` | GET | Request management |
-| `/admin/request/<id>/update` | POST | Update status |
+## 📈 Future Enhancements
 
-## Categories
+- [ ] Email notifications for status updates
+- [ ] File attachments for requests
+- [ ] Request assignment to specific admins
+- [ ] SLA tracking and escalation
+- [ ] Export reports (PDF/CSV)
+- [ ] Dark mode toggle
+- [ ] API authentication (JWT)
+- [ ] Docker containerization
 
-- IT Support
-- Facilities
-- Academic
-- Administrative
-- Financial
-- Other
+---
 
-## Scaling
+## 🤝 Contributing
 
-The SQLite database is suitable for small to medium deployments. For larger scale:
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-1. Migrate to PostgreSQL by updating the connection string
-2. Add connection pooling
-3. Consider adding Redis for session management
-4. Deploy with Gunicorn/uWSGI behind Nginx
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## License
+---
 
-MIT License - Free for institutional and commercial use.
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+### ⭐ Star this repository if you found it helpful!
+
+Made with ❤️ by [Dhanshree](https://github.com/Dhanshree-gamedev)
+
+</div>
